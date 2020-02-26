@@ -24,7 +24,7 @@ sensors_event_t event;
 void setup() {
   lcd.init();
   lcd.setBacklight(1);
-  Serial.begin(57600);
+  //Serial.begin(57600);
   Ethernet.begin(mac, ip , gw, mask);
   server.begin();
 
@@ -36,11 +36,10 @@ void setup() {
   sensor_t sensor;
   dht.temperature().getSensor(&sensor);
   delay(1000);
-  Serial.println("Starting...");
+  //Serial.println("Starting...");
 }
 
 void loop() {
-
   dht.temperature().getEvent(&event);
   temp = event.temperature;
   lcd.setCursor(0, 1);
@@ -50,7 +49,7 @@ void loop() {
   lcd.print("Server listening...");
   EthernetClient client = server.available();
   if (client) {
-    Serial.println("new client");
+    //Serial.println("new client");
 
     // an http request ends with a blank line
     boolean currentLineIsBlank = true;
@@ -63,7 +62,7 @@ void loop() {
     while (client.connected()) {
       if (client.available()) {
         char c = client.read();
-        Serial.write(c);
+        //Serial.write(c);
         // if you've gotten to the end of the line (received a newline
         // character) and the line is blank, the http request has ended,
         // so you can send a reply
@@ -75,14 +74,13 @@ void loop() {
           client.println();
           client.println("<!DOCTYPE HTML>");
           client.println("<html>");
-          // add a meta refresh tag, so the browser pulls again every 5 seconds:
           client.println("<meta http-equiv=\"refresh\" content=\"5\">");
 
           client.print("{ 'temperature': '");
           client.print(temp);
           client.print("' }\n");
+          
           client.println("<br />");
-
           client.println("</html>");
           break;
         }
@@ -98,14 +96,12 @@ void loop() {
     }
     // give the web browser time to receive the data
     delay(1);
-    // close the connection:
     client.stop();
-    Serial.println("client disonnected");
-
+    //Serial.println("client disonnected");
   }
 
   //EthernetClient client = server.available();
-  sensors_event_t event;
-  dht.temperature().getEvent(&event);
-  temp = event.temperature;
+  //sensors_event_t event;
+  //dht.temperature().getEvent(&event);
+  //temp = event.temperature;
 }
