@@ -14,8 +14,8 @@ DHT_Unified dht(DHTPIN, DHTTYPE);
 LiquidCrystal_I2C lcd(0x27, DISPLAY_COL, DISPLAY_ROW);
 byte mac[] = { 0x90, 0xA2, 0xDA, 0x0D, 0x32, 0x2C }; // MAC ADDRESS
 IPAddress ip(192, 168, 0, 230); // IP Address in DEC format
-byte gw[] = { 192, 168, 0, 1 };
-byte mask[] = {255, 255, 255, 0};
+byte gw[] = { 192, 168, 0, 1 }; // Gateway address
+byte mask[] = {255, 255, 255, 0}; // Netmask
 EthernetServer server(LISTENPORT);
 float temp = 0.0f;
 bool linked = true;
@@ -51,7 +51,6 @@ void loop() {
   if (client) {
     //Serial.println("new client");
 
-    // an http request ends with a blank line
     boolean currentLineIsBlank = true;
 
     dht.temperature().getEvent(&event);
@@ -62,12 +61,7 @@ void loop() {
     while (client.connected()) {
       if (client.available()) {
         char c = client.read();
-        //Serial.write(c);
-        // if you've gotten to the end of the line (received a newline
-        // character) and the line is blank, the http request has ended,
-        // so you can send a reply
         if (c == '\n' && currentLineIsBlank) {
-          // send a standard http response header
           client.println("HTTP/1.1 200 OK");
           client.println("Content-Type: text/html");
           client.println("Connection: close");
@@ -85,23 +79,15 @@ void loop() {
           break;
         }
         if (c == '\n') {
-          // you're starting a new line
           currentLineIsBlank = true;
         }
         else if (c != '\r') {
-          // you've gotten a character on the current line
           currentLineIsBlank = false;
         }
       }
     }
-    // give the web browser time to receive the data
     delay(1);
     client.stop();
     //Serial.println("client disonnected");
   }
-
-  //EthernetClient client = server.available();
-  //sensors_event_t event;
-  //dht.temperature().getEvent(&event);
-  //temp = event.temperature;
 }
